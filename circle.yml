@@ -1,0 +1,23 @@
+machine:
+  timezone: UTC
+  java:
+    version: oraclejdk8
+  environment:
+    _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
+dependencies:
+  override:
+    - mvn dependency:go-offline --fail-never
+compile:
+  override:
+    - mvn compile
+test:
+  override:
+    - mvn test
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+deployment:
+  staging:
+    branch: master
+    commands:
+      - ./deploy_staging.sh
